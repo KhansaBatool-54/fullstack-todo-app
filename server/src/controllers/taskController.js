@@ -114,6 +114,40 @@ const deleteTask = async (req, res) => {
   }
 };
 
+// Upload a file and attach it to an existing task
+const addAttachment = async (req, res) => {
+  try {
+    // Step A: find the task, but only if it belongs to the logged-in user
+    const task = await Task.findOne({ _id: req.params.id, userId: req.user._id });
+
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
+
+    // Step B: check that a file was actually sent
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Step C: multer + cloudinary already uploaded the file
+    // req.file contains the info Cloudinary gave back
+    const attachment = {
+      fileName: req.file.originalname,
+      fileUrl: req.file.path,
+      publicId: req.file.filename,
+      uploadedAt: new Date(),
+    };
+
+    // Step D: push it into the task's attachments array and save
+    task.attachments.push(attachment);
+    await task.save();
+
+    res.status(200).json(task);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createTask,
   getTasks,
@@ -121,4 +155,5 @@ module.exports = {
   updateTask,
   updateTaskStatus,
   deleteTask,
+  addAttachment,
 };
