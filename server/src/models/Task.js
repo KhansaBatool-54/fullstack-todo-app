@@ -7,14 +7,14 @@ const attachmentSchema = new mongoose.Schema(
     publicId: { type: String, required: true },
     uploadedAt: { type: Date, default: Date.now },
   },
-  { _id: false } // subdocument ko apna alag _id nahi chahiye (optional choice)
+  { _id: false } 
 );
 
 const taskSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // ye User model se link karta hai
+      ref: 'User',
       required: true,
     },
     title: {
